@@ -1,9 +1,11 @@
 package com.example.cucumber;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -40,6 +42,26 @@ public class OrderStepdefs {
     public void current_order_total_is(String price) {
         assertEquals("Wrong order price",
                 new BigDecimal(price), itemInfo.foodOrderService.getOrder().get().getPrice());
+    }
+
+    @Then("the order remains empty")
+    public void order_remains_empty() {
+        Optional<Order> order = itemInfo.foodOrderService.getOrder();
+        assertTrue("Order was not empty", !order.isPresent() || order.get().getItems().isEmpty());
+    }
+
+    @Then("the order contains {string}")
+    public void order_contains_item(String itemName) {
+        Optional<Order> order = itemInfo.foodOrderService.getOrder();
+        assertTrue("Order was null", order.isPresent());
+        assertTrue("Order did not contain " + itemName, order.get().getItems().contains(new Item(itemName, "")));
+    }
+
+    @Then("the order does not contain {string}")
+    public void order_does_not_contain(String itemName) {
+        Optional<Order> order = itemInfo.foodOrderService.getOrder();
+        assertTrue("Order was null", order.isPresent());
+        assertFalse("Order should not have contained " + itemName, order.get().getItems().contains(new Item(itemName, "")));
     }
 
 }
